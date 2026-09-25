@@ -44,24 +44,17 @@
       input.value = '';
       chat.scrollTop = chat.scrollHeight;
 
-      // Indicador de "Escribiendo..."
+      // Indicador de "Pensando..."
       const tempId = "loader-" + Date.now();
       chat.innerHTML += `<div class="msg bot" id="${tempId}">Pensando...</div>`;
       chat.scrollTop = chat.scrollHeight;
 
       try {
-        // Petición a la API pública de demostración
-        const res = await fetch('https://text.pollinations.ai/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [
-              { role: "system", content: "Eres una IA programadora experta. Responde directamente con explicación breve y código limpio." },
-              { role: "user", content: texto }
-            ]
-          })
-        });
+        // Petición a la API alternativa
+        const promptSistema = "Eres una IA programadora experta. Responde directamente con explicación breve y código limpio.";
+        const url = `https://text.pollinations.ai/${encodeURIComponent(promptSistema + "\n\nUsuario: " + texto)}?model=mistral`;
 
+        const res = await fetch(url);
         const respuestaTexto = await res.text();
         
         // Formatear bloque de código simple
@@ -69,7 +62,7 @@
         document.getElementById(tempId).innerHTML = textoFormateado;
 
       } catch (err) {
-        document.getElementById(tempId).innerText = "Error de conexión con la IA.";
+        document.getElementById(tempId).innerText = "Error de conexión con la IA. Inténtalo de nuevo.";
       }
       chat.scrollTop = chat.scrollHeight;
     }
